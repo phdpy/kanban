@@ -11,17 +11,22 @@
 </head>
 
 <body>
+//Aqui é o cabeçalho do Kanban, com o título e a descrição da aplicação.
+//acessamos o projeto pelo navegador no link http://kanban.local
+//Aqui dentro criamos a classe "cabecalho" que vai conter o título e a 
+//descrição do Kanban.
 
     <header class="cabecalho">
         <h1>📋 Kanban</h1>
         <p>Gestão de tarefas</p>
     </header>
-
+//Agora vamos criar o main do Kanban, que vai conter as colunas de tarefas.
+//A fazer , Em andamento e Concluída. Cada coluna vai ter um título e uma lista de tarefas.
     <main class="kanban">
 
         <section class="coluna">
             <h2>A Fazer</h2>
-
+//Definimos o id "a-fazer" para a lista de tarefas da coluna A Fazer, e a classe "lista-tarefas" para estilizar a lista de tarefas.
             <div id="a-fazer" class="lista-tarefas">
             </div>
         </section>
@@ -39,11 +44,23 @@
             <div id="concluida" class="lista-tarefas">
             </div>
         </section>
-
+//No app.ts eu vou referenciar essas atividades assim : document.querySelector("#a-fazer")...
+//Ou seja, estou verificando se existe o elemento com o id "a-fazer" no DOM, e se existir,
+// vou adicionar as tarefas na lista de tarefas da coluna A Fazer.
     </main>
 
     <script type="module" src="dist/app.js"></script>
-
+//Aqui estamos referenciando o arquivo app.js que foi gerado pelo TypeScript, 
+//e que contém a lógica do Kanban.
+//Estou executando o app.js porque o navegador executa o JavaScript, e não o TypeScript.
+// O TypeScript é compilado para JavaScript, e o arquivo app.js é o resultado dessa compilação.
+//src/app.ts
+//      ↓
+//   npx tsc
+//      ↓
+//dist/app.js
+//      ↓
+//Navegador
 </body>
 
 </html>

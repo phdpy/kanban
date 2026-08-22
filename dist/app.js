@@ -1,3 +1,7 @@
+//Esse arquivo app.ts é o arquivo principal do Kanban, que vai carregar as tarefas da
+//API e exibir na tela.
+
+
 async function carregarTarefas() {
     try {
         const resposta = await fetch("api.php");
@@ -15,12 +19,6 @@ async function carregarTarefas() {
 function criarCard(tarefa) {
     const card = document.createElement("div");
     card.classList.add("card-tarefa");
-    card.innerHTML = `
-        <h3>${tarefa.titulo}</h3>
-        <p>${tarefa.descricao}</p>
-        <p><strong>Prioridade:</strong> ${tarefa.prioridade}</p>
-        <p><strong>Responsável:</strong> ${tarefa.responsavel}</p>
-    `;
     if (tarefa.prioridade === "Alta") {
         card.classList.add("prioridade-alta");
     }
@@ -30,7 +28,22 @@ function criarCard(tarefa) {
     else if (tarefa.prioridade === "Baixa") {
         card.classList.add("prioridade-baixa");
     }
+    card.innerHTML = `
+        <h3>${tarefa.titulo}</h3>
+        <p>${tarefa.descricao}</p>
+        <p><strong>Prioridade:</strong> ${tarefa.prioridade}</p>
+        <p><strong>Responsável:</strong> ${tarefa.responsavel}</p>
+    `;
     return card;
+}
+function exibirMensagemSemTarefas() {
+    const mensagem = document.createElement("p");
+    mensagem.classList.add("sem-tarefas");
+    mensagem.textContent = "Nenhuma tarefa cadastrada.";
+    const colunas = document.querySelectorAll(".lista-tarefas");
+    colunas.forEach((coluna) => {
+        coluna.appendChild(mensagem.cloneNode(true));
+    });
 }
 function exibirTarefas(tarefas) {
     const colunaAFazer = document.querySelector("#a-fazer");
@@ -44,6 +57,10 @@ function exibirTarefas(tarefas) {
     colunaAFazer.innerHTML = "";
     colunaEmAndamento.innerHTML = "";
     colunaConcluida.innerHTML = "";
+    if (tarefas.length === 0) {
+        exibirMensagemSemTarefas();
+        return;
+    }
     tarefas.forEach((tarefa) => {
         const card = criarCard(tarefa);
         if (tarefa.status === "A Fazer") {
