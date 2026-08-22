@@ -1,0 +1,15 @@
+# Dependências do Node
+node_modules/
+
+# Configurações e credenciais locais
+config.php
+.env
+.env.*
+
+# Arquivos do sistema e editor
+.DS_Store
+.vscode/
+.idea/
+
+# Logs
+*.log

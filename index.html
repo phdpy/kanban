@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Kanban - Gestão de Tarefas</title>
+
+    <link rel="stylesheet" href="src/css/style.css">
+</head>
+
+<body>
+
+    <header class="cabecalho">
+        <h1>📋 Kanban</h1>
+        <p>Gestão de tarefas</p>
+    </header>
+
+    <main class="kanban">
+
+        <section class="coluna">
+            <h2>A Fazer</h2>
+
+            <div id="a-fazer" class="lista-tarefas">
+            </div>
+        </section>
+
+        <section class="coluna">
+            <h2>Em Andamento</h2>
+
+            <div id="em-andamento" class="lista-tarefas">
+            </div>
+        </section>
+
+        <section class="coluna">
+            <h2>Concluída</h2>
+
+            <div id="concluida" class="lista-tarefas">
+            </div>
+        </section>
+
+    </main>
+
+    <script type="module" src="dist/app.js"></script>
+
+</body>
+
+</html>
