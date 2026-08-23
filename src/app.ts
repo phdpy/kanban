@@ -136,7 +136,7 @@ function exibirTarefas(tarefas: Tarefa[]): void {
         } else if (tarefa.status === "Concluída") {
             colunaConcluida.appendChild(card);
         }
-
+//Recebe uma tarefa e devolve uma div HTML.
     });
 }
 
