@@ -72,3 +72,41 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+CREATE TABLE IF NOT EXISTS usuarios (
+    id INT NOT NULL AUTO_INCREMENT,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    cargo VARCHAR(100) NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_usuarios_email (email)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_general_ci;
+
+  -- Projetos
+CREATE TABLE IF NOT EXISTS projetos (
+    id INT NOT NULL AUTO_INCREMENT,
+    nome VARCHAR(100) NOT NULL,
+    descricao TEXT NOT NULL,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_general_ci;
+
+-- Relacionamentos das tarefas
+ALTER TABLE tarefas
+    ADD COLUMN projeto_id INT NULL,
+    ADD COLUMN usuario_id INT NULL,
+
+    ADD CONSTRAINT fk_tarefas_projeto
+        FOREIGN KEY (projeto_id)
+        REFERENCES projetos(id)
+        ON DELETE RESTRICT
+        ON UPDATE RESTRICT,
+
+    ADD CONSTRAINT fk_tarefas_usuario
+        FOREIGN KEY (usuario_id)
+        REFERENCES usuarios(id)
+        ON DELETE RESTRICT
+        ON UPDATE RESTRICT;

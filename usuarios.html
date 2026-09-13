@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Kanban - Usuários</title>
+
+    <!-- <link rel="stylesheet" href="src/css/style.css"> -->
+     <link rel="stylesheet" href="src/css/style.css?v=2">
+</head>
+
+<body class="pagina-usuarios">
+    <header class="cabecalho">
+        <nav aria-label="Navegação principal">
+            <a class="link-voltar" href="index.html">
+                ← Voltar ao Kanban
+            </a>
+        </nav>
+
+        <h1>Gerenciar usuários</h1>
+        <p>Organize as pessoas responsáveis pelas tarefas.</p>
+    </header>
+
+    <main class="usuarios-layout">
+        <section class="painel" aria-labelledby="titulo-cadastro">
+            <h2 id="titulo-cadastro">Dados do usuário</h2>
+            <p class="texto-apoio">
+                Preencha os campos para cadastrar ou editar uma pessoa.
+            </p>
+
+            <form id="form-usuario">
+                <div class="campo">
+                    <label for="nome">Nome</label>
+                    <input
+                        type="text"
+                        id="nome"
+                        name="nome"
+                        maxlength="100"
+                        autocomplete="name"
+                        placeholder="Ex.: Honda"
+                        required
+                    >
+                </div>
+
+                <div class="campo">
+                    <label for="email">E-mail</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        maxlength="150"
+                        autocomplete="email"
+                        placeholder="nome@exemplo.com"
+                        required
+                    >
+                </div>
+
+                <div class="campo">
+                    <label for="cargo">Cargo</label>
+                    <input
+                        type="text"
+                        id="cargo"
+                        name="cargo"
+                        maxlength="100"
+                        autocomplete="organization-title"
+                        placeholder="Ex.: Auxiliar técnico"
+                        required
+                    >
+                </div>
+
+                <div class="acoes-formulario">
+                    <button type="submit" id="botao-salvar" disabled>
+                        Cadastrar
+                    </button>
+
+                    <button type="button" id="botao-cancelar" hidden>
+                        Cancelar edição
+                    </button>
+                </div>
+            </form>
+
+            <p id="mensagem" role="status" aria-live="polite"></p>
+        </section>
+
+        <section class="painel" aria-labelledby="titulo-listagem">
+            <h2 id="titulo-listagem">Usuários cadastrados</h2>
+            <p class="texto-apoio">
+                Consulte os dados, edite um cadastro ou exclua um usuário.
+            </p>
+
+            <ul id="lista-usuarios"></ul>
+        </section>
+    </main>
+
+    <script type="module" src="dist/usuarios.js"></script>
+</body>
+
+</html>

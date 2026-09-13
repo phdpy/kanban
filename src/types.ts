@@ -12,3 +12,16 @@ export type Tarefa = {
 //Significa que tarefa é um array de objetos do tipo Tarefa, 
 // e cada objeto do array vai ter as propriedades id, titulo, descricao, status, prioridad
 // e e responsavel.
+
+export type Usuario = {
+    id: number;
+    nome: string;
+    email: string;
+    cargo: string;
+};
+
+export type Projeto = {
+    id: number;
+    nome: string;
+    descricao: string;
+};

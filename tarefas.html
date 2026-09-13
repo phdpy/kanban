@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Kanban - Cadastrar tarefa</title>
+
+    <link rel="stylesheet" href="src/css/style.css?v=3">
+</head>
+
+<body class="pagina-tarefas">
+    <header class="cabecalho">
+        <nav aria-label="Navegação principal">
+            <a class="link-voltar" href="index.html">
+                ← Voltar ao Kanban
+            </a>
+        </nav>
+
+        <h1>Cadastrar tarefa</h1>
+        <p>Defina a atividade, o projeto e quem será responsável.</p>
+    </header>
+
+    <main class="tarefas-layout">
+        <section class="painel" aria-labelledby="titulo-cadastro">
+            <h2 id="titulo-cadastro">Dados da tarefa</h2>
+
+            <form id="form-tarefa">
+                <div class="campo">
+                    <label for="titulo">Título</label>
+
+                    <input
+                        type="text"
+                        id="titulo"
+                        name="titulo"
+                        maxlength="150"
+                        placeholder="Ex.: Instalar sensor da esteira"
+                        required
+                    >
+                </div>
+
+                <div class="campo">
+                    <label for="descricao">Descrição</label>
+
+                    <textarea
+                        id="descricao"
+                        name="descricao"
+                        rows="5"
+                        maxlength="2000"
+                        placeholder="Descreva o que precisa ser feito."
+                        required
+                    ></textarea>
+                </div>
+
+                <div class="campo">
+                    <label for="projeto">Projeto</label>
+
+                    <select
+                        id="projeto"
+                        name="projeto_id"
+                        required
+                        disabled
+                    >
+                        <option value="">Aguardando carregamento...</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="responsavel">Responsável</label>
+
+                    <select
+                        id="responsavel"
+                        name="usuario_id"
+                        required
+                        disabled
+                    >
+                        <option value="">Aguardando carregamento...</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="status">Status</label>
+
+                    <select id="status" name="status" required>
+                        <option value="A Fazer">A Fazer</option>
+                        <option value="Em Andamento">Em Andamento</option>
+                        <option value="Concluída">Concluída</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="prioridade">Prioridade</label>
+
+                    <select id="prioridade" name="prioridade" required>
+                        <option value="">Selecione a prioridade</option>
+                        <option value="Alta">Alta</option>
+                        <option value="Média">Média</option>
+                        <option value="Baixa">Baixa</option>
+                    </select>
+                </div>
+
+                <div class="acoes-formulario">
+                    <button type="submit" id="botao-salvar" disabled>
+                        Cadastrar tarefa
+                    </button>
+                </div>
+            </form>
+
+            <p id="mensagem" role="status" aria-live="polite"></p>
+
+            <nav aria-label="Cadastros relacionados">
+                <a href="projetos.html">Cadastrar projeto</a>
+                <span aria-hidden="true"> | </span>
+                <a href="usuarios.html">Cadastrar responsável</a>
+            </nav>
+        </section>
+    </main>
+    <script type="module" src="dist/tarefas.js"></script>
+</body>
+
+</html>
