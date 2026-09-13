@@ -7,7 +7,8 @@
 
     <title>Kanban - Projetos</title>
 
-    <link rel="stylesheet" href="src/css/style.css?v=4">
+   <!--<link rel="stylesheet" href="src/css/style.css?v=4">-->
+   <link rel="stylesheet" href="src/css/style.css?v=6">
 </head>
 
 <body class="pagina-projetos">
@@ -20,6 +21,14 @@
 
         <h1>Gerenciar projetos</h1>
         <p>Organize os projetos que receberão as tarefas da equipe.</p>
+             <nav class="menu-principal" aria-label="Navegação principal">
+    <a href="index.html">Kanban</a>
+    <!--<a href="index.html" aria-current="page">Kanban</a>-->
+    <a href="tarefas.html">Cadastrar tarefa</a>
+    <a href="usuarios.html">Usuários</a>
+    <!--<a href="projetos.html">Projetos</a>-->
+    <a href="projetos.html" aria-current="page">Projetos</a>
+</nav>
     </header>
 
     <main class="projetos-layout">
@@ -61,12 +70,16 @@
                         Máximo de 2000 caracteres.
                     </small>
                 </div>
+                    <div class="acoes-formulario">
+                        <button type="submit" id="botao-salvar" disabled>
+                            Cadastrar projeto
+    </button>
 
-                <div class="acoes-formulario">
-                    <button type="submit" id="botao-salvar" disabled>
-                        Cadastrar projeto
-                    </button>
-                </div>
+                        <button type="button" id="botao-cancelar" hidden>
+                            Cancelar edição
+                        </button>
+                    </div>
+</div>
             </form>
 
             <p id="mensagem" role="status" aria-live="polite"></p>

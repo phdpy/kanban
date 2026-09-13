@@ -328,6 +328,15 @@ if ($metodo === "DELETE") {
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (PDOException $erro) {
+    // Impede excluir usuários que possuem tarefas vinculadas.
+if ((int) ($erro->errorInfo[1] ?? 0) === 1451) {
+    http_response_code(409);
+
+    echo json_encode([
+        "erro" => "Não é possível excluir este usuário porque ele possui tarefas vinculadas."
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
     // Código do MariaDB para valor duplicado em uma chave única.
     if ((int) ($erro->errorInfo[1] ?? 0) === 1062) {
         http_response_code(409);

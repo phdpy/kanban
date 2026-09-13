@@ -70,6 +70,23 @@ function criarCard(tarefa) {
         <p><strong>Prioridade:</strong> ${tarefa.prioridade}</p>
         <p><strong>Responsável:</strong> ${tarefa.responsavel}</p>
     `;
+    const botaoExcluir = document.createElement("button");
+    botaoExcluir.type = "button";
+    botaoExcluir.textContent = "Excluir";
+    botaoExcluir.classList.add("excluir-tarefa");
+    botaoExcluir.setAttribute("aria-label", `Excluir tarefa ${tarefa.titulo}`);
+    botaoExcluir.addEventListener("click", () => {
+        void excluirTarefa(tarefa, botaoExcluir);
+    });
+    const linkEditar = document.createElement("a");
+    linkEditar.textContent = "Editar";
+    linkEditar.href = `tarefas.html?id=${encodeURIComponent(String(tarefa.id))}`;
+    linkEditar.classList.add("editar-tarefa");
+    linkEditar.setAttribute("aria-label", `Editar tarefa ${tarefa.titulo}`);
+    const acoes = document.createElement("div");
+    acoes.classList.add("acoes-tarefa");
+    acoes.append(linkEditar, botaoExcluir);
+    card.appendChild(acoes);
     return card;
 }
 function exibirMensagemSemTarefas() {
@@ -116,6 +133,56 @@ function exibirTarefas(tarefas) {
 async function iniciarAplicacao() {
     const tarefas = await carregarTarefas();
     exibirTarefas(tarefas);
+}
+// Exclui uma tarefa somente após a confirmação do usuário.
+async function excluirTarefa(tarefa, botao) {
+    if (botao.disabled) {
+        return;
+    }
+    const confirmou = window.confirm(`Deseja excluir a tarefa "${tarefa.titulo}"? ` +
+        "Essa ação não pode ser desfeita.");
+    if (!confirmou) {
+        return;
+    }
+    // Garante um ID numérico, mesmo que a API o envie como texto.
+    const id = Number(tarefa.id);
+    if (!Number.isInteger(id) || id <= 0) {
+        window.alert("O ID da tarefa está inválido. Atualize a página.");
+        return;
+    }
+    botao.disabled = true;
+    botao.textContent = "Excluindo...";
+    try {
+        const resposta = await fetch("tarefas.php", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ id })
+        });
+        const dados = await resposta.json();
+        if (!resposta.ok) {
+            let texto = "Não foi possível excluir a tarefa.";
+            if (typeof dados === "object" &&
+                dados !== null &&
+                "erro" in dados &&
+                typeof dados.erro === "string") {
+                texto = dados.erro;
+            }
+            throw new Error(texto);
+        }
+        window.alert("Tarefa excluída com sucesso.");
+        // Recarrega o quadro para consultar as tarefas restantes.
+        window.location.reload();
+    }
+    catch (erro) {
+        const texto = erro instanceof Error
+            ? erro.message
+            : "Não foi possível excluir a tarefa.";
+        window.alert(texto);
+        botao.disabled = false;
+        botao.textContent = "Excluir";
+    }
 }
 iniciarAplicacao();
 export {};

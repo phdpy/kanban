@@ -28,6 +28,12 @@ function iniciarPagina(): void {
 
     let salvando: boolean = false;
     let listasProntas: boolean = false;
+    const parametros = new URLSearchParams(window.location.search);
+const idTexto = parametros.get("id");
+
+const tarefaEmEdicao: number | null = idTexto === null
+    ? null
+    : Number(idTexto);
 
     const mostrarMensagem = (texto: string): void => {
         mensagem.textContent = texto;
@@ -128,70 +134,161 @@ function iniciarPagina(): void {
         botao.disabled = bloqueado || !listasProntas;
     };
 
-    const carregarListas = async (): Promise<void> => {
-        listasProntas = false;
-        definirBloqueio(true);
-        mostrarMensagem("Carregando projetos e responsáveis...");
+    // Preenche o formulário quando a URL informa uma tarefa.
+const carregarTarefaParaEdicao = async (): Promise<void> => {
+    if (tarefaEmEdicao === null) {
+        return;
+    }
 
-        try {
-            // As duas consultas são independentes.
-            const [projetos, usuarios] = await Promise.all([
-                consultar("projetos.php"),
-                consultar("usuarios.php")
-            ]);
+    if (
+        !Number.isInteger(tarefaEmEdicao) ||
+        tarefaEmEdicao <= 0
+    ) {
+        throw new Error("O ID da tarefa na URL é inválido.");
+    }
 
-            if (
-                !Array.isArray(projetos) ||
-                !projetos.every(ehProjeto)
-            ) {
-                throw new Error("A lista de projetos está em formato inválido.");
-            }
+    const dados = await consultar(
+        `tarefas.php?id=${tarefaEmEdicao}`
+    );
 
-            if (
-                !Array.isArray(usuarios) ||
-                !usuarios.every(ehUsuario)
-            ) {
-                throw new Error("A lista de responsáveis está em formato inválido.");
-            }
+    if (
+        typeof dados !== "object" ||
+        dados === null ||
+        !("id" in dados) ||
+        dados.id !== tarefaEmEdicao ||
+        !("titulo" in dados) ||
+        typeof dados.titulo !== "string" ||
+        !("descricao" in dados) ||
+        typeof dados.descricao !== "string" ||
+        !("status" in dados) ||
+        typeof dados.status !== "string" ||
+        !("prioridade" in dados) ||
+        typeof dados.prioridade !== "string" ||
+        !("projeto_id" in dados) ||
+        !(
+            dados.projeto_id === null ||
+            (
+                typeof dados.projeto_id === "number" &&
+                Number.isInteger(dados.projeto_id) &&
+                dados.projeto_id > 0
+            )
+        ) ||
+        !("usuario_id" in dados) ||
+        !(
+            dados.usuario_id === null ||
+            (
+                typeof dados.usuario_id === "number" &&
+                Number.isInteger(dados.usuario_id) &&
+                dados.usuario_id > 0
+            )
+        )
+    ) {
+        throw new Error("A API retornou uma tarefa em formato inválido.");
+    }
 
-            preencherLista(
-                projeto,
-                projetos,
-                projetos.length === 0
-                    ? "Nenhum projeto cadastrado"
-                    : "Selecione o projeto"
-            );
+    titulo.value = dados.titulo;
+    descricao.value = dados.descricao;
+    status.value = dados.status;
+    prioridade.value = dados.prioridade;
 
-            preencherLista(
-                responsavel,
-                usuarios,
-                usuarios.length === 0
-                    ? "Nenhum responsável cadastrado"
-                    : "Selecione o responsável"
-            );
+    projeto.value = dados.projeto_id === null
+        ? ""
+        : String(dados.projeto_id);
 
-            listasProntas = projetos.length > 0 && usuarios.length > 0;
+    responsavel.value = dados.usuario_id === null
+        ? ""
+        : String(dados.usuario_id);
 
-            mostrarMensagem(
-                listasProntas
-                    ? ""
-                    : "Cadastre pelo menos um projeto e um responsável. Depois, atualize esta página."
-            );
+    botao.textContent = "Salvar alterações";
+    document.title = "Kanban - Editar tarefa";
 
-        } catch (erro: unknown) {
-            preencherLista(projeto, [], "Lista indisponível");
-            preencherLista(responsavel, [], "Lista indisponível");
+    const cabecalho = document.querySelector("h1");
 
-            const texto = erro instanceof Error
-                ? erro.message
-                : "Não foi possível carregar as opções.";
+    if (cabecalho instanceof HTMLHeadingElement) {
+        cabecalho.textContent = "Editar tarefa";
+    }
 
-            mostrarMensagem(`${texto} Atualize a página para tentar novamente.`);
+    if (!listasProntas) {
+        mostrarMensagem(
+            "Cadastre pelo menos um projeto e um responsável e atualize a página."
+        );
+    } else if (projeto.value === "" || responsavel.value === "") {
+        mostrarMensagem(
+            "Selecione um projeto e um responsável para completar os vínculos desta tarefa."
+        );
+    } else {
+        mostrarMensagem("Altere os dados e clique em Salvar alterações.");
+    }
+};
 
-        } finally {
-            definirBloqueio(false);
+   const carregarListas = async (): Promise<void> => {
+    listasProntas = false;
+    definirBloqueio(true);
+    mostrarMensagem("Carregando projetos e responsáveis...");
+
+    try {
+        const [projetos, usuarios] = await Promise.all([
+            consultar("projetos.php"),
+            consultar("usuarios.php")
+        ]);
+
+        if (
+            !Array.isArray(projetos) ||
+            !projetos.every(ehProjeto)
+        ) {
+            throw new Error("A lista de projetos está em formato inválido.");
         }
-    };
+
+        if (
+            !Array.isArray(usuarios) ||
+            !usuarios.every(ehUsuario)
+        ) {
+            throw new Error("A lista de responsáveis está em formato inválido.");
+        }
+
+        preencherLista(
+            projeto,
+            projetos,
+            projetos.length === 0
+                ? "Nenhum projeto cadastrado"
+                : "Selecione o projeto"
+        );
+
+        preencherLista(
+            responsavel,
+            usuarios,
+            usuarios.length === 0
+                ? "Nenhum responsável cadastrado"
+                : "Selecione o responsável"
+        );
+
+        listasProntas = projetos.length > 0 && usuarios.length > 0;
+
+        mostrarMensagem(
+            listasProntas
+                ? ""
+                : "Cadastre pelo menos um projeto e um responsável. Depois, atualize esta página."
+        );
+
+        // Depois de montar as opções, preenche a tarefa escolhida.
+        await carregarTarefaParaEdicao();
+
+    } catch (erro: unknown) {
+        listasProntas = false;
+
+        preencherLista(projeto, [], "Lista indisponível");
+        preencherLista(responsavel, [], "Lista indisponível");
+
+        const texto = erro instanceof Error
+            ? erro.message
+            : "Não foi possível carregar as opções.";
+
+        mostrarMensagem(`${texto} Atualize a página para tentar novamente.`);
+
+    } finally {
+        definirBloqueio(false);
+    }
+};
 
     const cadastrarTarefa = async (
         evento: SubmitEvent
@@ -244,11 +341,15 @@ function iniciarPagina(): void {
 
         try {
             const resposta = await fetch("tarefas.php", {
-                method: "POST",
+                method: tarefaEmEdicao === null ? "POST" : "PUT",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(tarefa)
+               body: JSON.stringify(
+    tarefaEmEdicao === null
+        ? tarefa
+        : { ...tarefa, id: tarefaEmEdicao }
+)
             });
 
             const dados: unknown = await resposta.json();
@@ -257,11 +358,17 @@ function iniciarPagina(): void {
                 throw new Error(obterMensagemErro(dados));
             }
 
-            formulario.reset();
+           if (tarefaEmEdicao === null) {
+    formulario.reset();
 
-            mostrarMensagem(
-                "Tarefa cadastrada com sucesso! Volte ao Kanban para visualizá-la."
-            );
+    mostrarMensagem(
+        "Tarefa cadastrada com sucesso! Volte ao Kanban para visualizá-la."
+    );
+} else {
+    mostrarMensagem(
+        "Tarefa atualizada com sucesso! Volte ao Kanban para conferir."
+    );
+}
 
         } catch (erro: unknown) {
             const texto = erro instanceof Error

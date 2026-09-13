@@ -747,3 +747,215 @@ body {
         padding: 20px;
     }
 }
+.pagina-projetos .acoes-formulario,
+.pagina-projetos .acoes-projeto {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.pagina-projetos .acoes-projeto {
+    margin-top: 16px;
+}
+
+.pagina-projetos .acoes-projeto button,
+.pagina-projetos #botao-cancelar {
+    min-height: 44px;
+    padding: 10px 16px;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.pagina-projetos .botao-editar {
+    color: #1e40af;
+    background-color: #eff6ff;
+}
+
+.pagina-projetos .botao-excluir {
+    color: #b91c1c;
+    background-color: #fff1f2;
+}
+
+.pagina-projetos #botao-cancelar {
+    color: #334155;
+    background-color: #f1f5f9;
+}
+
+.pagina-projetos .acoes-projeto button:hover:not(:disabled),
+.pagina-projetos #botao-cancelar:hover:not(:disabled) {
+    filter: brightness(0.95);
+}
+
+.pagina-projetos button:disabled {
+    opacity: 0.55;
+    cursor: wait;
+}
+.card-tarefa .excluir-tarefa {
+    min-height: 44px;
+    margin-top: 16px;
+    padding: 8px 14px;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #b91c1c;
+    background-color: #fff1f2;
+    border: 1px solid #fecdd3;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.card-tarefa .excluir-tarefa:hover:not(:disabled) {
+    background-color: #ffe4e6;
+}
+
+.card-tarefa .excluir-tarefa:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 3px;
+}
+
+.card-tarefa .excluir-tarefa:disabled {
+    opacity: 0.55;
+    cursor: wait;
+}
+/* Ações dos cards do Kanban */
+.card-tarefa .acoes-tarefa {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.card-tarefa .acoes-tarefa .editar-tarefa,
+.card-tarefa .acoes-tarefa .excluir-tarefa {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    margin: 0;
+    padding: 10px 16px;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.card-tarefa .acoes-tarefa .editar-tarefa {
+    color: #1e40af;
+    background-color: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.card-tarefa .acoes-tarefa .editar-tarefa:hover {
+    background-color: #dbeafe;
+}
+
+.card-tarefa .acoes-tarefa .excluir-tarefa {
+    color: #b91c1c;
+    background-color: #fff1f2;
+    border-color: #fecdd3;
+}
+
+.card-tarefa .acoes-tarefa .excluir-tarefa:hover:not(:disabled) {
+    background-color: #ffe4e6;
+}
+
+.card-tarefa .acoes-tarefa .excluir-tarefa:disabled {
+    opacity: 0.55;
+    cursor: wait;
+}
+
+/* Ações do formulário de tarefas */
+.pagina-tarefas .acoes-formulario {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.pagina-tarefas .cancelar-tarefa {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 10px 18px;
+    color: #334155;
+    background-color: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.pagina-tarefas .cancelar-tarefa:hover {
+    background-color: #e2e8f0;
+}
+
+.card-tarefa .editar-tarefa:focus-visible,
+.pagina-tarefas .cancelar-tarefa:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 3px;
+}
+/* MENU COMPARTILHADO ENTRE AS PÁGINAS */
+
+.cabecalho .menu-principal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    max-width: 1120px;
+    margin: 0 auto 24px;
+}
+
+.cabecalho .menu-principal a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 10px 18px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #334155;
+    background-color: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.cabecalho .menu-principal a:hover {
+    color: #1e40af;
+    background-color: #dbeafe;
+    border-color: #93c5fd;
+}
+
+.cabecalho .menu-principal a[aria-current="page"] {
+    color: #ffffff;
+    background-color: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+.cabecalho .menu-principal a:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 3px;
+}
+
+/* Duas opções por linha em telas pequenas. */
+@media (max-width: 600px) {
+    .cabecalho .menu-principal {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .cabecalho .menu-principal a {
+        padding: 10px;
+        text-align: center;
+    }
+}

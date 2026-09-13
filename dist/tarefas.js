@@ -22,6 +22,11 @@ function iniciarPagina() {
     }
     let salvando = false;
     let listasProntas = false;
+    const parametros = new URLSearchParams(window.location.search);
+    const idTexto = parametros.get("id");
+    const tarefaEmEdicao = idTexto === null
+        ? null
+        : Number(idTexto);
     const mostrarMensagem = (texto) => {
         mensagem.textContent = texto;
     };
@@ -94,12 +99,71 @@ function iniciarPagina() {
         responsavel.disabled = bloqueado || !listasProntas;
         botao.disabled = bloqueado || !listasProntas;
     };
+    // Preenche o formulário quando a URL informa uma tarefa.
+    const carregarTarefaParaEdicao = async () => {
+        if (tarefaEmEdicao === null) {
+            return;
+        }
+        if (!Number.isInteger(tarefaEmEdicao) ||
+            tarefaEmEdicao <= 0) {
+            throw new Error("O ID da tarefa na URL é inválido.");
+        }
+        const dados = await consultar(`tarefas.php?id=${tarefaEmEdicao}`);
+        if (typeof dados !== "object" ||
+            dados === null ||
+            !("id" in dados) ||
+            dados.id !== tarefaEmEdicao ||
+            !("titulo" in dados) ||
+            typeof dados.titulo !== "string" ||
+            !("descricao" in dados) ||
+            typeof dados.descricao !== "string" ||
+            !("status" in dados) ||
+            typeof dados.status !== "string" ||
+            !("prioridade" in dados) ||
+            typeof dados.prioridade !== "string" ||
+            !("projeto_id" in dados) ||
+            !(dados.projeto_id === null ||
+                (typeof dados.projeto_id === "number" &&
+                    Number.isInteger(dados.projeto_id) &&
+                    dados.projeto_id > 0)) ||
+            !("usuario_id" in dados) ||
+            !(dados.usuario_id === null ||
+                (typeof dados.usuario_id === "number" &&
+                    Number.isInteger(dados.usuario_id) &&
+                    dados.usuario_id > 0))) {
+            throw new Error("A API retornou uma tarefa em formato inválido.");
+        }
+        titulo.value = dados.titulo;
+        descricao.value = dados.descricao;
+        status.value = dados.status;
+        prioridade.value = dados.prioridade;
+        projeto.value = dados.projeto_id === null
+            ? ""
+            : String(dados.projeto_id);
+        responsavel.value = dados.usuario_id === null
+            ? ""
+            : String(dados.usuario_id);
+        botao.textContent = "Salvar alterações";
+        document.title = "Kanban - Editar tarefa";
+        const cabecalho = document.querySelector("h1");
+        if (cabecalho instanceof HTMLHeadingElement) {
+            cabecalho.textContent = "Editar tarefa";
+        }
+        if (!listasProntas) {
+            mostrarMensagem("Cadastre pelo menos um projeto e um responsável e atualize a página.");
+        }
+        else if (projeto.value === "" || responsavel.value === "") {
+            mostrarMensagem("Selecione um projeto e um responsável para completar os vínculos desta tarefa.");
+        }
+        else {
+            mostrarMensagem("Altere os dados e clique em Salvar alterações.");
+        }
+    };
     const carregarListas = async () => {
         listasProntas = false;
         definirBloqueio(true);
         mostrarMensagem("Carregando projetos e responsáveis...");
         try {
-            // As duas consultas são independentes.
             const [projetos, usuarios] = await Promise.all([
                 consultar("projetos.php"),
                 consultar("usuarios.php")
@@ -122,8 +186,11 @@ function iniciarPagina() {
             mostrarMensagem(listasProntas
                 ? ""
                 : "Cadastre pelo menos um projeto e um responsável. Depois, atualize esta página.");
+            // Depois de montar as opções, preenche a tarefa escolhida.
+            await carregarTarefaParaEdicao();
         }
         catch (erro) {
+            listasProntas = false;
             preencherLista(projeto, [], "Lista indisponível");
             preencherLista(responsavel, [], "Lista indisponível");
             const texto = erro instanceof Error
@@ -172,18 +239,25 @@ function iniciarPagina() {
         mostrarMensagem("Salvando tarefa...");
         try {
             const resposta = await fetch("tarefas.php", {
-                method: "POST",
+                method: tarefaEmEdicao === null ? "POST" : "PUT",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(tarefa)
+                body: JSON.stringify(tarefaEmEdicao === null
+                    ? tarefa
+                    : { ...tarefa, id: tarefaEmEdicao })
             });
             const dados = await resposta.json();
             if (!resposta.ok) {
                 throw new Error(obterMensagemErro(dados));
             }
-            formulario.reset();
-            mostrarMensagem("Tarefa cadastrada com sucesso! Volte ao Kanban para visualizá-la.");
+            if (tarefaEmEdicao === null) {
+                formulario.reset();
+                mostrarMensagem("Tarefa cadastrada com sucesso! Volte ao Kanban para visualizá-la.");
+            }
+            else {
+                mostrarMensagem("Tarefa atualizada com sucesso! Volte ao Kanban para conferir.");
+            }
         }
         catch (erro) {
             const texto = erro instanceof Error

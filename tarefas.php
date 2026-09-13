@@ -12,14 +12,65 @@ function responder(int $codigo, array $dados): void
 }
 
 try {
-    // Nesta etapa, esta API recebe somente cadastros.
-    if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-        header("Allow: POST");
+// GET: consulta uma tarefa pelo ID.
+if ($_SERVER["REQUEST_METHOD"] === "GET") {
+    $idConsulta = filter_var(
+        $_GET["id"] ?? null,
+        FILTER_VALIDATE_INT,
+        ["options" => ["min_range" => 1]]
+    );
 
-        responder(405, [
-            "erro" => "Método não permitido. Use POST para cadastrar."
+    if ($idConsulta === false || $idConsulta === null) {
+        responder(422, [
+            "erro" => "Informe um ID de tarefa válido."
         ]);
     }
+
+    require_once __DIR__ . "/config.php";
+
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    $stmt = $pdo->prepare(
+        "SELECT id, titulo, descricao, status, prioridade,
+                projeto_id, usuario_id
+         FROM tarefas
+         WHERE id = :id"
+    );
+
+    $stmt->execute(["id" => $idConsulta]);
+
+    $tarefa = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($tarefa === false) {
+        responder(404, [
+            "erro" => "Tarefa não encontrada."
+        ]);
+    }
+
+    $tarefa["id"] = (int) $tarefa["id"];
+    $tarefa["descricao"] = $tarefa["descricao"] ?? "";
+
+    $tarefa["projeto_id"] = $tarefa["projeto_id"] === null
+        ? null
+        : (int) $tarefa["projeto_id"];
+
+    $tarefa["usuario_id"] = $tarefa["usuario_id"] === null
+        ? null
+        : (int) $tarefa["usuario_id"];
+
+    responder(200, $tarefa);
+}
+    // Nesta etapa, esta API recebe somente cadastros.
+    // POST cadastra, PUT edita e DELETE exclui.
+    $metodo = $_SERVER["REQUEST_METHOD"];
+
+if (!in_array($metodo, ["POST", "PUT", "DELETE"], true)) {
+    header("Allow: GET,POST, PUT, DELETE");
+
+    responder(405, [
+        "erro" => "Método não permitido. Use POST, PUT ou DELETE."
+    ]);
+}
 
     $corpo = file_get_contents("php://input");
 
@@ -35,6 +86,42 @@ try {
             "erro" => "Envie os dados da tarefa como um objeto JSON."
         ]);
     }
+// Edição e exclusão precisam identificar a tarefa.
+$id = null;
+
+if ($metodo === "PUT" || $metodo === "DELETE") {
+    $id = $dados->id ?? null;
+
+    if (!is_int($id) || $id <= 0) {
+        responder(422, [
+            "erro" => "Informe um ID de tarefa válido."
+        ]);
+    }
+}
+
+// DELETE precisa somente do ID.
+if ($metodo === "DELETE") {
+    require_once __DIR__ . "/config.php";
+
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    $stmt = $pdo->prepare(
+        "DELETE FROM tarefas WHERE id = :id"
+    );
+
+    $stmt->execute(["id" => $id]);
+
+    if ($stmt->rowCount() === 0) {
+        responder(404, [
+            "erro" => "Tarefa não encontrada. Atualize o quadro."
+        ]);
+    }
+
+    responder(200, [
+        "mensagem" => "Tarefa excluída com sucesso."
+    ]);
+}
+
 
     // Valida os campos de texto.
     $campos = [];
@@ -138,6 +225,48 @@ try {
         ]);
     }
 
+    // PUT: atualiza uma tarefa existente.
+if ($metodo === "PUT") {
+    $stmt = $pdo->prepare(
+        "SELECT id FROM tarefas WHERE id = :id"
+    );
+
+    $stmt->execute(["id" => $id]);
+
+    if ($stmt->fetch(PDO::FETCH_ASSOC) === false) {
+        responder(404, [
+            "erro" => "Tarefa não encontrada. Atualize o quadro."
+        ]);
+    }
+
+    $sql = "UPDATE tarefas
+            SET titulo = :titulo,
+                descricao = :descricao,
+                status = :status,
+                prioridade = :prioridade,
+                responsavel = :responsavel,
+                projeto_id = :projeto_id,
+                usuario_id = :usuario_id
+            WHERE id = :id";
+
+    $stmt = $pdo->prepare($sql);
+
+    $stmt->execute([
+        "titulo" => $campos["titulo"],
+        "descricao" => $campos["descricao"],
+        "status" => $campos["status"],
+        "prioridade" => $campos["prioridade"],
+        "responsavel" => $usuario["nome"],
+        "projeto_id" => $projetoId,
+        "usuario_id" => $usuarioId,
+        "id" => $id
+    ]);
+
+    responder(200, [
+        "mensagem" => "Tarefa atualizada com sucesso."
+    ]);
+}
+
     // Guarda os vínculos e mantém o nome usado pelo quadro atual.
     $sql = "INSERT INTO tarefas (
                 titulo,
@@ -197,6 +326,6 @@ try {
     }
 
     responder(500, [
-        "erro" => "Não foi possível cadastrar a tarefa."
+        "erro" => "Não foi possível realizar a operação na tarefa."
     ]);
 }

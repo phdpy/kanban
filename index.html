@@ -7,7 +7,9 @@
 
     <title>Kanban - Gestão de Tarefas</title>
 
-    <link rel="stylesheet" href="src/css/style.css">
+    <!-- <link rel="stylesheet" href="src/css/style.css"> -->
+     <link rel="stylesheet" href="src/css/style.css?v=6">
+
 </head>
 
 <body>
@@ -18,6 +20,13 @@
     <header class="cabecalho">
         <h1>📋 Kanban</h1>
         <p>Gestão de tarefas</p>
+            <nav class="menu-principal" aria-label="Navegação principal">
+    <!--<a href="index.html">Kanban</a>-->
+    <a href="index.html" aria-current="page">Kanban</a>
+    <a href="tarefas.html">Cadastrar tarefa</a>
+    <a href="usuarios.html">Usuários</a>
+    <a href="projetos.html">Projetos</a>
+</nav>
     </header>
 <!-- Agora vamos criar o main do Kanban, que vai conter as colunas de tarefas. -->
 <!-- A fazer , Em andamento e Concluída. Cada coluna vai ter um título e uma lista de tarefas. -->
@@ -48,7 +57,8 @@
 <!--  vou adicionar as tarefas na lista de tarefas da coluna A Fazer. -->
     </main>
 
-    <script type="module" src="dist/app.js"></script>
+    <link rel="stylesheet" href="src/css/style.css?v=5">
+    <script type="module" src="dist/app.js?v=3"></script>
 <!-- Aqui estamos referenciando o arquivo app.js que foi gerado pelo TypeScript,  -->
 <!-- e que contém a lógica do Kanban. -->
 <!-- Estou executando o app.js porque o navegador executa o JavaScript, e não o TypeScript. -->

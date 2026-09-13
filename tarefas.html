@@ -7,7 +7,9 @@
 
     <title>Kanban - Cadastrar tarefa</title>
 
-    <link rel="stylesheet" href="src/css/style.css?v=3">
+    <!-- <link rel="stylesheet" href="src/css/style.css?v=5"> -->
+     <link rel="stylesheet" href="src/css/style.css?v=6">
+
 </head>
 
 <body class="pagina-tarefas">
@@ -20,6 +22,13 @@
 
         <h1>Cadastrar tarefa</h1>
         <p>Defina a atividade, o projeto e quem será responsável.</p>
+            <nav class="menu-principal" aria-label="Navegação principal">
+    <a href="index.html">Kanban</a>
+    <!--<a href="tarefas.html">Cadastrar tarefa</a>-->
+    <a href="tarefas.html" aria-current="page">Cadastrar tarefa</a>
+    <a href="usuarios.html">Usuários</a>
+    <a href="projetos.html">Projetos</a>
+</nav>
     </header>
 
     <main class="tarefas-layout">
@@ -104,6 +113,9 @@
                     <button type="submit" id="botao-salvar" disabled>
                         Cadastrar tarefa
                     </button>
+                    <a href="index.html" class="cancelar-tarefa">
+                    Voltar sem salvar
+                    </a>
                 </div>
             </form>
 
@@ -116,7 +128,7 @@
             </nav>
         </section>
     </main>
-    <script type="module" src="dist/tarefas.js"></script>
+    <script type="module" src="dist/tarefas.js?v=2"></script>
 </body>
 
 </html>
