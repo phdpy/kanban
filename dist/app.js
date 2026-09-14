@@ -1,4 +1,5 @@
 //// aqui eu estou importando as definicoes de taredas from .types.ts
+import { atualizarIndicadores } from "./dashboard.js";
 async function carregarTarefas() {
     //o Async significa que essa funcao trabalha de forma assincrona, ou seja,
     //  ela nao bloqueia a execucao do codigo enquanto espera a resposta da API.
@@ -132,6 +133,7 @@ function exibirTarefas(tarefas) {
 }
 async function iniciarAplicacao() {
     const tarefas = await carregarTarefas();
+    atualizarIndicadores(tarefas);
     exibirTarefas(tarefas);
 }
 // Exclui uma tarefa somente após a confirmação do usuário.
@@ -185,4 +187,3 @@ async function excluirTarefa(tarefa, botao) {
     }
 }
 iniciarAplicacao();
-export {};

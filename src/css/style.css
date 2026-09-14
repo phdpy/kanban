@@ -959,3 +959,33 @@ body {
         text-align: center;
     }
 }
+/* Indicadores do quadro */
+.indicadores {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    max-width: 1400px;
+    margin: 24px auto 0;
+    padding: 0 30px;
+}
+
+.indicador {
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #dbe3ed;
+    border-top: 4px solid #2563eb;
+    border-radius: 12px;
+}
+
+.indicador h2 {
+    color: #526174;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.indicador p {
+    color: #1e293b;
+    font-size: 2rem;
+    font-weight: 700;
+}

@@ -6,6 +6,7 @@
 //4. Iniciar a aplicação
 import type { Tarefa } from "./types";
 //// aqui eu estou importando as definicoes de taredas from .types.ts
+import { atualizarIndicadores } from "./dashboard.js";
 async function carregarTarefas(): Promise<Tarefa[]> {
 //o Async significa que essa funcao trabalha de forma assincrona, ou seja,
 //  ela nao bloqueia a execucao do codigo enquanto espera a resposta da API.
@@ -173,9 +174,9 @@ function exibirTarefas(tarefas: Tarefa[]): void {
 }
 
 async function iniciarAplicacao(): Promise<void> {
-
     const tarefas = await carregarTarefas();
 
+    atualizarIndicadores(tarefas);
     exibirTarefas(tarefas);
 }
 // Exclui uma tarefa somente após a confirmação do usuário.
