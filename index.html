@@ -9,6 +9,7 @@
 
     <!-- <link rel="stylesheet" href="src/css/style.css"> -->
      <link rel="stylesheet" href="src/css/style.css?v=6">
+    <link rel="stylesheet" href="src/css/style.css?v=7">
 
 </head>
 
@@ -28,6 +29,40 @@
     <a href="projetos.html">Projetos</a>
 </nav>
     </header>
+    <section class="filtros-kanban" aria-labelledby="titulo-filtros">
+    <h2 id="titulo-filtros">Filtrar tarefas</h2>
+
+    <div class="campos-filtros">
+        <div>
+            <label for="filtro-status">Status</label>
+
+            <select id="filtro-status">
+                <option value="">Todos os status</option>
+                <option value="A Fazer">A Fazer</option>
+                <option value="Em Andamento">Em Andamento</option>
+                <option value="Concluída">Concluída</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="filtro-prioridade">Prioridade</label>
+
+            <select id="filtro-prioridade">
+                <option value="">Todas as prioridades</option>
+                <option value="Alta">Alta</option>
+                <option value="Média">Média</option>
+                <option value="Baixa">Baixa</option>
+            </select>
+        </div>
+
+        <button type="button" id="limpar-filtros">
+            Limpar filtros
+        </button>
+    </div>
+
+    <p id="resumo-filtros" role="status" aria-live="polite"></p>
+    <p>Os indicadores abaixo consideram as tarefas filtradas.</p>
+</section>
     <section class="indicadores" aria-label="Resumo das tarefas">
     <div class="indicador">
         <h2>Total de tarefas</h2>
@@ -53,6 +88,20 @@
         <h2>Percentual concluído</h2>
         <p id="indicador-percentual">—</p>
     </div>
+</section>
+<section class="painel-ranking" aria-labelledby="titulo-ranking">
+    <h2 id="titulo-ranking">Tarefas por responsável</h2>
+
+    <p class="descricao-ranking">
+        Quantidade de tarefas na seleção atual, da maior para a menor.
+        Empates são ordenados por nome.
+    </p>
+
+    <ul id="ranking-responsaveis">
+        <li>Aguardando carregamento...</li>
+    </ul>
+
+    <p id="aviso-ranking"></p>
 </section>
 <!-- Agora vamos criar o main do Kanban, que vai conter as colunas de tarefas. -->
 <!-- A fazer , Em andamento e Concluída. Cada coluna vai ter um título e uma lista de tarefas. -->
@@ -84,7 +133,8 @@
     </main>
 
     <link rel="stylesheet" href="src/css/style.css?v=5">
-    <script type="module" src="dist/app.js?v=3"></script>
+   <script type="module" src="dist/app.js?v=4"></script>
+
 <!-- Aqui estamos referenciando o arquivo app.js que foi gerado pelo TypeScript,  -->
 <!-- e que contém a lógica do Kanban. -->
 <!-- Estou executando o app.js porque o navegador executa o JavaScript, e não o TypeScript. -->

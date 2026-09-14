@@ -7,6 +7,8 @@
 import type { Tarefa } from "./types";
 //// aqui eu estou importando as definicoes de taredas from .types.ts
 import { atualizarIndicadores } from "./dashboard.js";
+import { configurarFiltros } from "./filtros.js";
+import { atualizarRanking } from "./ranking.js";
 async function carregarTarefas(): Promise<Tarefa[]> {
 //o Async significa que essa funcao trabalha de forma assincrona, ou seja,
 //  ela nao bloqueia a execucao do codigo enquanto espera a resposta da API.
@@ -123,7 +125,7 @@ function exibirMensagemSemTarefas(): void {
 
     mensagem.classList.add("sem-tarefas");
 
-    mensagem.textContent = "Nenhuma tarefa cadastrada.";
+    mensagem.textContent = "Nenhuma tarefa para exibir.";
 
     const colunas = document.querySelectorAll(".lista-tarefas");
 
@@ -176,8 +178,14 @@ function exibirTarefas(tarefas: Tarefa[]): void {
 async function iniciarAplicacao(): Promise<void> {
     const tarefas = await carregarTarefas();
 
-    atualizarIndicadores(tarefas);
-    exibirTarefas(tarefas);
+    configurarFiltros(
+        tarefas,
+        (tarefasFiltradas: Tarefa[]): void => {
+            atualizarIndicadores(tarefasFiltradas);
+            atualizarRanking(tarefasFiltradas);
+            exibirTarefas(tarefasFiltradas);
+        }
+    );
 }
 // Exclui uma tarefa somente após a confirmação do usuário.
 async function excluirTarefa(

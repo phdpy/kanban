@@ -989,3 +989,147 @@ body {
     font-size: 2rem;
     font-weight: 700;
 }
+/* Filtros do Kanban */
+.filtros-kanban {
+    max-width: 1340px;
+    margin: 24px auto 0;
+    padding: 24px;
+    background-color: #ffffff;
+    border: 1px solid #dbe3ed;
+    border-radius: 12px;
+}
+
+.filtros-kanban h2 {
+    margin-bottom: 16px;
+    color: #1e293b;
+    font-size: 1.1rem;
+}
+
+.campos-filtros {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 16px;
+}
+
+.campos-filtros > div {
+    flex: 1 1 200px;
+}
+
+.campos-filtros label {
+    display: block;
+    margin-bottom: 6px;
+    color: #334155;
+    font-weight: 600;
+}
+
+.campos-filtros select,
+.campos-filtros button {
+    min-height: 44px;
+    padding: 10px 14px;
+    font: inherit;
+    border: 1px solid #94a3b8;
+    border-radius: 8px;
+}
+
+.campos-filtros select {
+    width: 100%;
+    color: #1e293b;
+    background-color: #ffffff;
+}
+
+.campos-filtros button {
+    color: #1e40af;
+    background-color: #eff6ff;
+    cursor: pointer;
+}
+
+.campos-filtros button:hover {
+    background-color: #dbeafe;
+}
+
+.campos-filtros select:focus-visible,
+.campos-filtros button:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 3px;
+}
+
+.filtros-kanban p {
+    margin-top: 12px;
+    color: #526174;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 1400px) {
+    .filtros-kanban {
+        margin-left: 24px;
+        margin-right: 24px;
+    }
+}
+/* Ranking de responsáveis */
+.painel-ranking {
+    max-width: 1340px;
+    margin: 24px auto 0;
+    padding: 24px;
+    background-color: #ffffff;
+    border: 1px solid #dbe3ed;
+    border-radius: 12px;
+}
+
+.painel-ranking h2 {
+    margin-bottom: 8px;
+    color: #1e293b;
+    font-size: 1.15rem;
+}
+
+.painel-ranking .descricao-ranking,
+.painel-ranking #aviso-ranking {
+    color: #526174;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+#ranking-responsaveis {
+    display: grid;
+    gap: 10px;
+    margin-top: 18px;
+    padding: 0;
+    list-style: none;
+}
+
+#ranking-responsaveis li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    color: #334155;
+    background-color: #f8fafc;
+    border: 1px solid #dbe3ed;
+    border-radius: 8px;
+}
+
+#ranking-responsaveis span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+#ranking-responsaveis strong {
+    padding: 5px 12px;
+    color: #1e40af;
+    background-color: #dbeafe;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+#aviso-ranking:not(:empty) {
+    margin-top: 16px;
+}
+
+@media (max-width: 1400px) {
+    .painel-ranking {
+        margin-left: 24px;
+        margin-right: 24px;
+    }
+}

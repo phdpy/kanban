@@ -1,3 +1,4 @@
+// Dados de uma tarefa recebida pela API do quadro.
 export type Tarefa = {
     id: number;
     titulo: string;
@@ -5,14 +6,13 @@ export type Tarefa = {
     status: string;
     prioridade: string;
     responsavel: string;
-};
-//Aqui estamos definindo o tipo Tarefa, que vai ser usado para tipar as tarefas do Kanban.
-//Essa interface tarefas apresenta os dados que vem da API
-//Se eu jogar um const tarefas : Tarefa []
-//Significa que tarefa é um array de objetos do tipo Tarefa, 
-// e cada objeto do array vai ter as propriedades id, titulo, descricao, status, prioridad
-// e e responsavel.
 
+    // Tarefas antigas podem ainda não ter esses vínculos.
+    projeto_id: number | null;
+    usuario_id: number | null;
+};
+
+// Dados de um usuário.
 export type Usuario = {
     id: number;
     nome: string;
@@ -20,6 +20,7 @@ export type Usuario = {
     cargo: string;
 };
 
+// Dados de um projeto.
 export type Projeto = {
     id: number;
     nome: string;

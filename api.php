@@ -1,38 +1,65 @@
 <?php
-//http://kanban.local/api.php
-//A responsabilidade da API é:
-//consultar banco
-//      ↓
-//pegar tarefas
-//      ↓
-//transformar em JSON
-//      ↓
-//enviar para o front-end
 
+// Esta API fornece as tarefas para o quadro Kanban.
+header("Content-Type: application/json; charset=UTF-8");
 
-require_once "config.php";
-//require_once "config.php";
 try {
-//Depois executamos uma consulta SQL:
-    $sql = "SELECT * FROM tarefas";
+    require_once __DIR__ . "/config.php";
+
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // Busca o nome atual do usuário vinculado.
+    // Para tarefas antigas, mantém o responsável salvo na tarefa.
+    $sql = "SELECT
+                t.id,
+                t.titulo,
+                COALESCE(t.descricao, '') AS descricao,
+                t.status,
+                t.prioridade,
+                COALESCE(u.nome, t.responsavel) AS responsavel,
+                t.projeto_id,
+                t.usuario_id
+            FROM tarefas AS t
+            LEFT JOIN usuarios AS u
+                ON u.id = t.usuario_id
+            ORDER BY t.id";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
 
     $tarefas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    header("Content-Type: application/json; charset=UTF-8");
-//O resultado é buscado e enviado:
-//O json_encode() transforma os dados PHP em JSON.
-echo json_encode($tarefas);
+    // Padroniza os IDs antes de enviar o JSON.
+    foreach ($tarefas as $indice => $tarefa) {
+        $tarefas[$indice]["id"] = (int) $tarefa["id"];
 
-} catch (PDOException $e) {
+        $tarefas[$indice]["projeto_id"] =
+            $tarefa["projeto_id"] === null
+                ? null
+                : (int) $tarefa["projeto_id"];
 
+        $tarefas[$indice]["usuario_id"] =
+            $tarefa["usuario_id"] === null
+                ? null
+                : (int) $tarefa["usuario_id"];
+    }
+
+    echo json_encode(
+        $tarefas,
+        JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
+    );
+
+} catch (\PDOException $erro) {
     http_response_code(500);
 
-    header("Content-Type: application/json; charset=UTF-8");
+    echo json_encode([
+        "erro" => "Não foi possível carregar as tarefas."
+    ], JSON_UNESCAPED_UNICODE);
+
+} catch (\JsonException $erro) {
+    http_response_code(500);
 
     echo json_encode([
-        "erro" => "Erro ao buscar tarefas."
-    ]);
+        "erro" => "Não foi possível converter as tarefas para JSON."
+    ], JSON_UNESCAPED_UNICODE);
 }
