@@ -1,10 +1,14 @@
 import type { Usuario } from "./types";
+import { Cpf } from "./entidades/cpf.js";
 
 function iniciarPagina(): void {
     const formulario = document.querySelector("#form-usuario");
     const campoNome = document.querySelector("#nome");
     const campoEmail = document.querySelector("#email");
     const campoCargo = document.querySelector("#cargo");
+    const campoCpf = document.querySelector("#cpf");
+    const campoSenha = document.querySelector("#senha");
+    const camposCadastro = document.querySelector("#campos-cadastro");
     const botao = document.querySelector("#botao-salvar");
     const botaoCancelar = document.querySelector("#botao-cancelar");
     const mensagem = document.querySelector("#mensagem");
@@ -16,6 +20,9 @@ function iniciarPagina(): void {
         !(campoNome instanceof HTMLInputElement) ||
         !(campoEmail instanceof HTMLInputElement) ||
         !(campoCargo instanceof HTMLInputElement) ||
+        !(campoCpf instanceof HTMLInputElement) ||
+        !(campoSenha instanceof HTMLInputElement) ||
+        !(camposCadastro instanceof HTMLDivElement) ||
         !(botao instanceof HTMLButtonElement) ||
         !(botaoCancelar instanceof HTMLButtonElement) ||
         !(mensagem instanceof HTMLParagraphElement) ||
@@ -43,7 +50,8 @@ function iniciarPagina(): void {
         botaoCancelar.disabled = ativo;
         campoNome.disabled = ativo;
         campoEmail.disabled = ativo;
-        campoCargo.disabled = ativo;
+        campoCpf.disabled = ativo || usuarioEmEdicao !== null;
+        campoSenha.disabled = ativo || usuarioEmEdicao !== null;
 
         lista.querySelectorAll("button").forEach((controle): void => {
             controle.disabled = ativo;
@@ -87,9 +95,15 @@ function iniciarPagina(): void {
     const limparFormulario = (): void => {
         usuarioEmEdicao = null;
         formulario.reset();
-
         botao.textContent = "Cadastrar";
         botaoCancelar.hidden = true;
+        camposCadastro.hidden = false;
+
+        campoCpf.required = true;
+        campoSenha.required = true;
+
+        campoCpf.disabled = processando;
+        campoSenha.disabled = processando;
     };
 
     // Preenche os campos com os dados do usuário escolhido.
@@ -109,6 +123,18 @@ function iniciarPagina(): void {
 
         mostrarMensagem(`Editando o usuário ${usuario.nome}.`);
         campoNome.focus();
+
+        // A edição atual altera apenas nome, e-mail e cargo.
+        camposCadastro.hidden = true;
+
+        campoCpf.value = "";
+        campoSenha.value = "";
+
+        campoCpf.required = false;
+        campoSenha.required = false;
+
+        campoCpf.disabled = true;
+        campoSenha.disabled = true;
     };
 
     // Cria os itens e os botões da listagem.
@@ -133,6 +159,7 @@ function iniciarPagina(): void {
                 `${usuario.nome} — ${usuario.email} — ${usuario.cargo} `;
 
             botaoEditar.type = "button";
+            botaoEditar.textContent = "Editar";
             botaoEditar.classList.add("botao-editar");
             botaoEditar.disabled = processando;
 
@@ -146,6 +173,7 @@ function iniciarPagina(): void {
             });
 
             botaoExcluir.type = "button";
+            botaoExcluir.textContent = "Excluir";
             botaoExcluir.classList.add("botao-excluir");
             botaoExcluir.disabled = processando;
 
@@ -248,74 +276,101 @@ function iniciarPagina(): void {
 
     // POST cadastra; PUT atualiza o usuário selecionado.
     const salvarUsuario = async (
-        evento: SubmitEvent
-    ): Promise<void> => {
-        evento.preventDefault();
+    evento: SubmitEvent
+): Promise<void> => {
+    evento.preventDefault();
 
-        if (processando) {
-            return;
-        }
+    if (processando) {
+        return;
+    }
 
-        const usuario = {
-            nome: campoNome.value.trim(),
-            email: campoEmail.value.trim(),
-            cargo: campoCargo.value.trim()
-        };
+    if (!formulario.reportValidity()) {
+        return;
+    }
 
-        if (
-            usuario.nome === "" ||
-            usuario.email === "" ||
-            usuario.cargo === ""
-        ) {
-            mostrarMensagem("Preencha todos os campos.");
-            return;
-        }
+    const usuario = {
+        nome: campoNome.value.trim(),
+        email: campoEmail.value.trim(),
+        cargo: campoCargo.value.trim()
+    };
 
-        const editando = usuarioEmEdicao !== null;
+    if (
+        usuario.nome === "" ||
+        usuario.email === "" ||
+        usuario.cargo === ""
+    ) {
+        mostrarMensagem("Preencha nome, e-mail e cargo.");
+        return;
+    }
 
-        const dadosEnvio = editando
-            ? { ...usuario, id: usuarioEmEdicao }
-            : usuario;
+    const editando = usuarioEmEdicao !== null;
 
-        definirProcessamento(true);
-        mostrarMensagem("Salvando usuário...");
+    definirProcessamento(true);
+    mostrarMensagem("Validando os dados...");
 
-        try {
-            const resposta = await fetch("usuarios.php", {
-                method: editando ? "PUT" : "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(dadosEnvio)
+    try {
+        let corpo: string;
+
+        if (editando) {
+            corpo = JSON.stringify({
+                ...usuario,
+                id: usuarioEmEdicao
             });
+        } else {
+            // O construtor impede criar um objeto com CPF inválido.
+            const cpf = new Cpf(campoCpf.value);
 
-            const dados: unknown = await resposta.json();
+            const senha = campoSenha.value;
 
-            if (!resposta.ok) {
-                throw new Error(obterMensagemErro(dados));
+            if (senha.trim() === "") {
+                throw new Error("Informe uma senha.");
             }
 
-            limparFormulario();
-
-            mostrarMensagem(
-                editando
-                    ? "Usuário atualizado com sucesso."
-                    : "Usuário cadastrado com sucesso."
-            );
-
-            await carregarUsuarios();
-
-        } catch (erro: unknown) {
-            const texto = erro instanceof Error
-                ? erro.message
-                : "Não foi possível salvar o usuário.";
-
-            mostrarMensagem(texto);
-
-        } finally {
-            definirProcessamento(false);
+            // Usa o getter para obter somente os 11 dígitos.
+            corpo = JSON.stringify({
+                ...usuario,
+                cpf: cpf.valor,
+                senha
+            });
         }
-    };
+
+        mostrarMensagem("Salvando usuário...");
+
+        const resposta = await fetch("usuarios.php", {
+            method: editando ? "PUT" : "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: corpo
+        });
+
+        const dados: unknown = await resposta.json();
+
+        if (!resposta.ok) {
+            throw new Error(obterMensagemErro(dados));
+        }
+
+        limparFormulario();
+
+        mostrarMensagem(
+            editando
+                ? "Usuário atualizado com sucesso."
+                : "Usuário cadastrado com sucesso."
+        );
+
+        await carregarUsuarios();
+
+    } catch (erro: unknown) {
+        const texto = erro instanceof Error
+            ? erro.message
+            : "Não foi possível salvar o usuário.";
+
+        mostrarMensagem(texto);
+
+    } finally {
+        definirProcessamento(false);
+    }
+};
 
     botaoCancelar.addEventListener("click", (): void => {
         if (processando) {

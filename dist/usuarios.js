@@ -1,8 +1,12 @@
+import { Cpf } from "./entidades/cpf.js";
 function iniciarPagina() {
     const formulario = document.querySelector("#form-usuario");
     const campoNome = document.querySelector("#nome");
     const campoEmail = document.querySelector("#email");
     const campoCargo = document.querySelector("#cargo");
+    const campoCpf = document.querySelector("#cpf");
+    const campoSenha = document.querySelector("#senha");
+    const camposCadastro = document.querySelector("#campos-cadastro");
     const botao = document.querySelector("#botao-salvar");
     const botaoCancelar = document.querySelector("#botao-cancelar");
     const mensagem = document.querySelector("#mensagem");
@@ -12,6 +16,9 @@ function iniciarPagina() {
         !(campoNome instanceof HTMLInputElement) ||
         !(campoEmail instanceof HTMLInputElement) ||
         !(campoCargo instanceof HTMLInputElement) ||
+        !(campoCpf instanceof HTMLInputElement) ||
+        !(campoSenha instanceof HTMLInputElement) ||
+        !(camposCadastro instanceof HTMLDivElement) ||
         !(botao instanceof HTMLButtonElement) ||
         !(botaoCancelar instanceof HTMLButtonElement) ||
         !(mensagem instanceof HTMLParagraphElement) ||
@@ -33,7 +40,8 @@ function iniciarPagina() {
         botaoCancelar.disabled = ativo;
         campoNome.disabled = ativo;
         campoEmail.disabled = ativo;
-        campoCargo.disabled = ativo;
+        campoCpf.disabled = ativo || usuarioEmEdicao !== null;
+        campoSenha.disabled = ativo || usuarioEmEdicao !== null;
         lista.querySelectorAll("button").forEach((controle) => {
             controle.disabled = ativo;
         });
@@ -69,6 +77,11 @@ function iniciarPagina() {
         formulario.reset();
         botao.textContent = "Cadastrar";
         botaoCancelar.hidden = true;
+        camposCadastro.hidden = false;
+        campoCpf.required = true;
+        campoSenha.required = true;
+        campoCpf.disabled = processando;
+        campoSenha.disabled = processando;
     };
     // Preenche os campos com os dados do usuário escolhido.
     const iniciarEdicao = (usuario) => {
@@ -83,6 +96,14 @@ function iniciarPagina() {
         botaoCancelar.hidden = false;
         mostrarMensagem(`Editando o usuário ${usuario.nome}.`);
         campoNome.focus();
+        // A edição atual altera apenas nome, e-mail e cargo.
+        camposCadastro.hidden = true;
+        campoCpf.value = "";
+        campoSenha.value = "";
+        campoCpf.required = false;
+        campoSenha.required = false;
+        campoCpf.disabled = true;
+        campoSenha.disabled = true;
     };
     // Cria os itens e os botões da listagem.
     const exibirUsuarios = (usuarios) => {
@@ -101,6 +122,7 @@ function iniciarPagina() {
             texto.textContent =
                 `${usuario.nome} — ${usuario.email} — ${usuario.cargo} `;
             botaoEditar.type = "button";
+            botaoEditar.textContent = "Editar";
             botaoEditar.classList.add("botao-editar");
             botaoEditar.disabled = processando;
             botaoEditar.setAttribute("aria-label", `Editar usuário ${usuario.nome}`);
@@ -108,6 +130,7 @@ function iniciarPagina() {
                 iniciarEdicao(usuario);
             });
             botaoExcluir.type = "button";
+            botaoExcluir.textContent = "Excluir";
             botaoExcluir.classList.add("botao-excluir");
             botaoExcluir.disabled = processando;
             botaoExcluir.setAttribute("aria-label", `Excluir usuário ${usuario.nome}`);
@@ -185,6 +208,9 @@ function iniciarPagina() {
         if (processando) {
             return;
         }
+        if (!formulario.reportValidity()) {
+            return;
+        }
         const usuario = {
             nome: campoNome.value.trim(),
             email: campoEmail.value.trim(),
@@ -193,22 +219,41 @@ function iniciarPagina() {
         if (usuario.nome === "" ||
             usuario.email === "" ||
             usuario.cargo === "") {
-            mostrarMensagem("Preencha todos os campos.");
+            mostrarMensagem("Preencha nome, e-mail e cargo.");
             return;
         }
         const editando = usuarioEmEdicao !== null;
-        const dadosEnvio = editando
-            ? { ...usuario, id: usuarioEmEdicao }
-            : usuario;
         definirProcessamento(true);
-        mostrarMensagem("Salvando usuário...");
+        mostrarMensagem("Validando os dados...");
         try {
+            let corpo;
+            if (editando) {
+                corpo = JSON.stringify({
+                    ...usuario,
+                    id: usuarioEmEdicao
+                });
+            }
+            else {
+                // O construtor impede criar um objeto com CPF inválido.
+                const cpf = new Cpf(campoCpf.value);
+                const senha = campoSenha.value;
+                if (senha.trim() === "") {
+                    throw new Error("Informe uma senha.");
+                }
+                // Usa o getter para obter somente os 11 dígitos.
+                corpo = JSON.stringify({
+                    ...usuario,
+                    cpf: cpf.valor,
+                    senha
+                });
+            }
+            mostrarMensagem("Salvando usuário...");
             const resposta = await fetch("usuarios.php", {
                 method: editando ? "PUT" : "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(dadosEnvio)
+                body: corpo
             });
             const dados = await resposta.json();
             if (!resposta.ok) {
@@ -243,4 +288,3 @@ function iniciarPagina() {
     void carregarUsuarios();
 }
 iniciarPagina();
-export {};
